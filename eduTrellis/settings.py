@@ -4,16 +4,16 @@ Django settings for eduTrellis project (Django 5.2+ ready).
 
 from pathlib import Path
 import os
-from django.core.management.utils import get_random_secret_key
+
 # --------------------
 # BASE SETTINGS
 # --------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY
-SECRET_KEY = "django-insecure-h^l!e0kvn8ore3fikloht@x^6nlif_jbgg$=x=!0b(v-lu#ev_"
+SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-h^l!e0kvn8ore3fikloht@x^6nlif_jbgg$=x=!0b(v-lu#ev_")
 
-DEBUG = True
+DEBUG = os.environ.get("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = ['*']
 
@@ -81,7 +81,7 @@ WSGI_APPLICATION = "eduTrellis.wsgi.application"
 
 # --------------------
 # DATABASE
-
+# --------------------
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -141,8 +141,8 @@ LOGOUT_REDIRECT_URL = "/login/"
 # --------------------
 # THIRD-PARTY INTEGRATIONS
 # --------------------
-RAZORPAY_KEY_ID = 'rzp_test_RaygzMDa8nwFFP'
-RAZORPAY_KEY_SECRET = 'F1mtVXEvOvbyc6atPUAEwdZd'
+RAZORPAY_KEY_ID = os.environ.get('RAZORPAY_KEY_ID', 'rzp_test_RaygzMDa8nwFFP')
+RAZORPAY_KEY_SECRET = os.environ.get('RAZORPAY_KEY_SECRET', 'F1mtVXEvOvbyc6atPUAEwdZd')
 
 JITSI_DOMAIN = "meet.ffmuc.net"
 
@@ -187,10 +187,22 @@ CSRF_TRUSTED_ORIGINS = [
     "https://ganeshsirclasses.online",
     "https://www.ganeshsirclasses.online",
     "https://web-production-ab46.up.railway.app",
+    "https://web-production-24789.up.railway.app",
 ]
 
-DEFAULT_FILE_STORAGE = "edutrellis.dropbox_storage.DropboxStorage"
+# --------------------
+# DROPBOX STORAGE
+# --------------------
+# Only enable Dropbox storage if credentials are provided via environment
+_dropbox_key = os.environ.get("DROPBOX_APP_KEY", "wgg2fsw5pf16x8q")
+_dropbox_secret = os.environ.get("DROPBOX_APP_SECRET", "38dg9gi6djz3zuu")
+_dropbox_token = os.environ.get("DROPBOX_REFRESH_TOKEN", "Si57f7yXuB0AAAAAAAAAAZGrsYbd1YLQpvGHxlJES4DRvKr7mDfZo8xqLaJBTY_s")
 
-DROPBOX_APP_KEY = "wgg2fsw5pf16x8q"
-DROPBOX_APP_SECRET = "38dg9gi6djz3zuu"
-DROPBOX_REFRESH_TOKEN = "Si57f7yXuB0AAAAAAAAAAZGrsYbd1YLQpvGHxlJES4DRvKr7mDfZo8xqLaJBTY_s"
+DROPBOX_APP_KEY = _dropbox_key
+DROPBOX_APP_SECRET = _dropbox_secret
+DROPBOX_REFRESH_TOKEN = _dropbox_token
+
+# Use Dropbox storage only if a custom storage module exists; otherwise use default
+import importlib.util as _ilu
+if _ilu.find_spec("eduTrellis.dropbox_storage") is not None:
+    DEFAULT_FILE_STORAGE = "eduTrellis.dropbox_storage.DropboxStorage"
