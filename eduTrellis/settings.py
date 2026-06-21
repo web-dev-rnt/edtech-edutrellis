@@ -15,7 +15,14 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-h^l!e0kvn8ore3fikloht
 
 DEBUG = os.environ.get("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    '*',
+    'edtech-edutrellis-production.up.railway.app',
+    'www.thevedaeducation.info',
+    'thevedaeducation.info',
+    'ganeshsirclasses.online',
+    'www.ganeshsirclasses.online',
+]
 
 # --------------------
 # APPLICATIONS
@@ -126,7 +133,13 @@ AUTH_USER_MODEL = "base.User"
 CSRF_COOKIE_SECURE = not DEBUG
 SESSION_COOKIE_SECURE = not DEBUG
 SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
-SECURE_SSL_REDIRECT = not DEBUG
+
+# Railway handles SSL termination via proxy — do NOT redirect to HTTPS inside the app
+# Setting this to True causes an infinite redirect loop on Railway
+SECURE_SSL_REDIRECT = False
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
@@ -183,7 +196,9 @@ SECURE_REFERRER_POLICY = 'same-origin'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 CSRF_TRUSTED_ORIGINS = [
+    "https://edtech-edutrellis-production.up.railway.app",
     "https://www.thevedaeducation.info",
+    "https://thevedaeducation.info",
     "https://ganeshsirclasses.online",
     "https://www.ganeshsirclasses.online",
     "https://web-production-ab46.up.railway.app",
